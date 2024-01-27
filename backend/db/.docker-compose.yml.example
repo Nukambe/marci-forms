@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB:
+      POSTGRES_PASSWORD:
+    user: postgres
+    volumes:
+      - pgdata:
+    ports:
+      - 5432:5432
+
+volumes:
+  pgdata:
