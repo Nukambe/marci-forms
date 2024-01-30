@@ -21,6 +21,17 @@ export default function SignInPage() {
     );
   }
 
+  function handleGuestLogin(credential, password) {
+    setForm({ email: credential, password });
+    setLoggingIn(true);
+    dispatch(login({ credential, password })).catch((err) =>
+      err.json().then((err) => {
+        setError(err);
+        setLoggingIn(false);
+      })
+    );
+  }
+
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-green-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -95,6 +106,27 @@ export default function SignInPage() {
             </button>
           </div>
         </form>
+
+        <button
+          type="button"
+          className="flex w-full mt-8 justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          disabled={loggingIn}
+          onClick={() =>
+            handleGuestLogin("user.test@marci-forms.org", "password")
+          }
+        >
+          Log In with Guest Account
+        </button>
+        <button
+          type="button"
+          className="flex w-full mt-2 justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          disabled={loggingIn}
+          onClick={() =>
+            handleGuestLogin("admin@marci-forms.org", "administrator")
+          }
+        >
+          Log In with Guest Admin Account
+        </button>
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Don't have an account?{" "}
