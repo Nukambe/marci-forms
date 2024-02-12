@@ -25,7 +25,7 @@ export function DragDropItem({ id, children }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="flex w-full">
+    <div ref={setNodeRef} style={style} className="flex w-full touch-none">
       <div
         {...attributes}
         {...listeners}
