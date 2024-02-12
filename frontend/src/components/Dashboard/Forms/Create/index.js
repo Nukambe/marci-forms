@@ -101,7 +101,7 @@ export default function CreateForm() {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto">
         <div className="mx-auto max-w-3xl">
           {form && <EditAlert />}
           <div className="flex justify-end mb-8 gap-x-4">

@@ -48,7 +48,7 @@ export default function Navigation() {
   return (
     <Disclosure
       as="nav"
-      className="bg-green-200 shadow-md z-50 absolute w-full"
+      className="bg-green-200 shadow-md z-50 fixed top-0 w-full"
     >
       {({ open }) => (
         <>

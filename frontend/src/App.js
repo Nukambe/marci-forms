@@ -10,6 +10,7 @@ import NotFound from "./components/NotFound";
 import Navigation from "./components/Navigation/Navigation";
 import Form from "./components/Forms/Form";
 import Dashboard from "./components/Dashboard";
+import DashboardNavigation from "./components/Navigation/DashboardNavigation";
 
 function App() {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ function App() {
       {user ? (
         <>
           <Navigation />
-          <div className="pt-16">
+          <div className="pt-24 pb-24 px-4 md:pb-0 w-full h-full">
             <Switch>
               <Route exact path="/">
                 <Home />
@@ -51,6 +52,7 @@ function App() {
               </Route>
             </Switch>
           </div>
+          {user.role === "admin" && <DashboardNavigation />}
         </>
       ) : (
         <Switch>

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUsers, updateUserRole } from "../../../store/users";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import UserTableHead from "./UserTableHead";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import UsersButton from "./UsersButton";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -31,8 +31,8 @@ export default function Users() {
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 mt-8">
-      <div className="mt-8 flow-root">
+    <div className="px-4">
+      <div className="flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <form
@@ -67,7 +67,7 @@ export default function Users() {
                     <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
                       {user.firstName}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500 hidden md:table-cell">
                       {user.email}
                     </td>
                     <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
@@ -112,7 +112,7 @@ export default function Users() {
           </p>
         </div>
         <div className="flex flex-1 justify-between sm:justify-end items-center">
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 hidden lg:block">
             Results per page:
             <span className="ml-3 mr-5 relative inline-block text-left">
               <select
@@ -127,36 +127,32 @@ export default function Users() {
               </select>
             </span>
           </p>
-          <button
+          <UsersButton
             onClick={() => setQuery({ ...query, page: 1 })}
             disabled={query.page === 1}
-            className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 enabled:hover:bg-gray-50 focus-visible:outline-offset-0 disabled:opacity-50"
           >
             First
-          </button>
-          <button
+          </UsersButton>
+          <UsersButton
             onClick={() => setQuery({ ...query, page: query.page - 1 })}
             disabled={query.page === 1}
-            className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 enabled:hover:bg-gray-50 focus-visible:outline-offset-0 disabled:opacity-50"
           >
             Previous
-          </button>
-          <button
+          </UsersButton>
+          <UsersButton
             onClick={() => setQuery({ ...query, page: query.page + 1 })}
             disabled={query.page === Math.ceil(count / query.limit)}
-            className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 enabled:hover:bg-gray-50 focus-visible:outline-offset-0 disabled:opacity-50"
           >
             Next
-          </button>
-          <button
+          </UsersButton>
+          <UsersButton
             onClick={() =>
               setQuery({ ...query, page: Math.ceil(count / query.limit) })
             }
             disabled={query.page === Math.ceil(count / query.limit)}
-            className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 enabled:hover:bg-gray-50 focus-visible:outline-offset-0 disabled:opacity-50"
           >
             Last
-          </button>
+          </UsersButton>
         </div>
       </nav>
     </div>

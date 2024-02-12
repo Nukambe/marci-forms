@@ -23,7 +23,10 @@ export default function UserTableHead({ query, setQuery }) {
           <th
             key={column.name}
             scope="col"
-            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+            className={classNames(
+              column.name === "email" ? "hidden md:table-cell" : "table-cell",
+              "py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+            )}
           >
             <div className="flex items-center gap-x-2">
               <div
