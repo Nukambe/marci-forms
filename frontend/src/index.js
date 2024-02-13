@@ -9,7 +9,6 @@ import { csrfFetch, restoreCSRF } from "./store/csrf";
 import * as sessionActions from "./store/session";
 import { SessionProvider } from "./context/sessionContext";
 import { ModalProvider } from "./context/Modal";
-import { FormProvider } from "./context/formContext";
 
 const store = configureStore();
 
@@ -27,9 +26,7 @@ function Root() {
       <ReduxProvider store={store}>
         <SessionProvider>
           <BrowserRouter>
-            <FormProvider>
-              <App />
-            </FormProvider>
+            <App />
           </BrowserRouter>
         </SessionProvider>
       </ReduxProvider>

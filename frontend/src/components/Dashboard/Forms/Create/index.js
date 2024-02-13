@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { DragDropList, DragDropItem } from "../../../DragNDrop";
-import { FormContext } from "../../../../context/formContext";
 import EditQuestion from "./EditQuestion";
 import { PlusCircleIcon, MinusCircleIcon } from "@heroicons/react/24/solid";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createForm, updateForm } from "../../../../store/forms";
@@ -16,64 +15,43 @@ export default function CreateForm() {
   const form = useSelector((state) =>
     state.forms.forms.find((f) => f.id === parseInt(formId || 0))
   );
+  const [newForm, setNewForm] = useState({
+    title: "",
+    questions: [],
+    headerNotes: [],
+    footerNotes: [],
+    description: "",
+  });
   const [showModal, setShowModal] = useState(false);
   const [publishState, setPublishState] = useState({
     loading: false,
     error: null,
   });
-  const {
-    title,
-    setTitle,
-    description,
-    setDescription,
-    questions,
-    setQuestions,
-    headerNotes,
-    setHeaderNotes,
-    footerNotes,
-    setFooterNotes,
-  } = useContext(FormContext);
 
   useEffect(() => {
     if (form) {
-      setTitle(form.title);
-      setDescription(form.description);
-      setQuestions(
-        form.questions.map((q) => ({ ...q, id: uuidv4(), active: false }))
+      const headerNotes = form.headerNotes.map((note) => ({
+        id: uuidv4(),
+        text: note,
+      }));
+      const footerNotes = form.footerNotes.map((note) => ({
+        id: uuidv4(),
+        text: note,
+      }));
+      setNewForm(
+        JSON.parse(JSON.stringify({ ...form, headerNotes, footerNotes }))
       );
-      setHeaderNotes(form.headerNotes.map((n) => ({ id: uuidv4(), text: n })));
-      setFooterNotes(form.footerNotes.map((n) => ({ id: uuidv4(), text: n })));
-    } else {
-      setTitle("");
-      setDescription("");
-      setQuestions([]);
-      setHeaderNotes([]);
-      setFooterNotes([]);
     }
-  }, [
-    form,
-    setTitle,
-    setDescription,
-    setQuestions,
-    setHeaderNotes,
-    setFooterNotes,
-  ]);
+  }, [form]);
 
-  function publishForm(e) {
-    e.preventDefault();
+  function publishForm() {
     setPublishState({ loading: true, error: null });
     setShowModal(true);
-    const form = {
-      title,
-      description,
-      questions,
-      headerNotes,
-      footerNotes,
-    };
     const errors = [];
-    if (!form.title) errors.push("Title is required");
-    if (!questions.length) errors.push("At least one question is required");
-    questions?.forEach((q) => {
+    if (!newForm.title) errors.push("Title is required");
+    if (!newForm.questions.length)
+      errors.push("At least one question is required");
+    newForm.questions?.forEach((q) => {
       if (!q.text) errors.push("Question text is required");
       if (q.type === 2 && !q.options.length)
         errors.push("At least one option is required");
@@ -84,15 +62,91 @@ export default function CreateForm() {
     }
 
     if (formId) {
-      dispatch(updateForm(form, formId))
+      dispatch(updateForm(newForm, formId))
         .then(() => setPublishState({ loading: false, error: null }))
         .catch((err) => setPublishState({ loading: false, error: [err] }));
     } else {
-      dispatch(createForm(form))
+      dispatch(createForm(newForm))
         .then(() => setPublishState({ loading: false, error: null }))
         .catch((err) => setPublishState({ loading: false, error: [err] }));
     }
   }
+
+  const setTitle = (title) => {
+    setNewForm({ ...newForm, title });
+  };
+
+  const setDescription = (description) => {
+    setNewForm({ ...newForm, description });
+  };
+
+  const setHeaderNotes = (headerNotes) => {
+    setNewForm({ ...newForm, headerNotes });
+  };
+
+  const setQuestions = (questions) => {
+    if (JSON.stringify(questions) === JSON.stringify(newForm.questions)) return; // prevent unnecessary re-renders
+    setNewForm(JSON.parse(JSON.stringify({ ...newForm, questions })));
+  };
+
+  const setFooterNotes = (footerNotes) => {
+    setNewForm(JSON.parse(JSON.stringify({ ...newForm, footerNotes })));
+  };
+
+  const setQuestionText = (id, text) => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.find((q) => q.id === id).text = text;
+    setQuestions(questions);
+  };
+
+  const setQuestionType = (id, type) => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.find((q) => q.id === id).type = type;
+    setQuestions(questions);
+  };
+
+  const setOptionText = (id, index, text) => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.find((q) => q.id === id).options[index] = text;
+    setQuestions(questions);
+  };
+
+  const addOption = (id) => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.find((q) => q.id === id).options.push("");
+    setQuestions(questions);
+  };
+
+  const removeOption = (id, index) => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.find((q) => q.id === id).options.splice(index, 1);
+    setQuestions(questions);
+  };
+
+  const addQuestion = () => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.push({
+      id: uuidv4(),
+      type: 1,
+      text: "",
+      options: ["YES", "NO", "N/A"],
+      active: true,
+    });
+    setQuestions(questions);
+  };
+
+  const removeQuestion = (id) => {
+    let questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions = questions.filter((q) => q.id !== id);
+    setQuestions(questions);
+  };
+
+  const setActive = (id) => {
+    const questions = JSON.parse(JSON.stringify(newForm.questions));
+    questions.forEach((q) => (q.active = false));
+    questions.find((q) => q.id === id).active = true;
+    setQuestions(questions);
+  };
 
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
@@ -106,7 +160,8 @@ export default function CreateForm() {
           {form && <EditAlert />}
           <div className="flex justify-end mb-8 gap-x-4">
             <button
-              onClick={(e) => publishForm(e)}
+              type="button"
+              onClick={publishForm}
               className="bg-green-600 py-2 px-6 rounded-md text-white font-bold text-lg hover:bg-green-500"
             >
               Publish
@@ -125,7 +180,7 @@ export default function CreateForm() {
                 name="name"
                 id="name"
                 className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-4xl sm:leading-6"
-                value={title}
+                value={newForm.title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
@@ -141,7 +196,7 @@ export default function CreateForm() {
                 name="name"
                 id="name"
                 className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-2xl sm:leading-6"
-                value={description}
+                value={newForm.description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
@@ -153,8 +208,8 @@ export default function CreateForm() {
             </span>
           </div>
           <form className="space-y-12">
-            <DragDropList items={headerNotes} setItems={setHeaderNotes}>
-              {headerNotes.map((note) => (
+            <DragDropList items={newForm.headerNotes} setItems={setHeaderNotes}>
+              {newForm.headerNotes?.map((note) => (
                 <DragDropItem key={note.id} id={note.id}>
                   <input //header note input
                     type="text"
@@ -162,15 +217,19 @@ export default function CreateForm() {
                     placeholder="Note..."
                     value={note.text}
                     onChange={(e) => {
-                      const notes = [...headerNotes];
+                      const notes = JSON.parse(
+                        JSON.stringify(newForm.headerNotes)
+                      );
                       notes.find((n) => n.id === note.id).text = e.target.value;
                       setHeaderNotes(notes);
                     }}
                   />
                   <button //remove header note
-                    onClick={(e) => {
-                      e.preventDefault();
-                      let notes = [...headerNotes];
+                    type="button"
+                    onClick={() => {
+                      let notes = JSON.parse(
+                        JSON.stringify(newForm.headerNotes)
+                      );
                       notes = notes.filter((n) => n.id !== note.id);
                       setHeaderNotes(notes);
                     }}
@@ -181,10 +240,10 @@ export default function CreateForm() {
               ))}
             </DragDropList>
             <button //add header note
+              type="button"
               className="flex items-center gap-x-2 bg-green-600 rounded-md px-2 py-1 text-white font-semibold hover:bg-green-500"
-              onClick={(e) => {
-                e.preventDefault();
-                const notes = [...headerNotes];
+              onClick={() => {
+                const notes = JSON.parse(JSON.stringify(newForm.headerNotes));
                 notes.push({ id: uuidv4(), text: "" });
                 setHeaderNotes(notes);
               }}
@@ -194,36 +253,40 @@ export default function CreateForm() {
                 <PlusCircleIcon className="w-8" />
               </span>
             </button>
-            <DragDropList items={questions} setItems={setQuestions}>
-              {questions.map((question) => (
-                <DragDropItem key={question.id} id={question.id}>
-                  <EditQuestion question={question} />
+            <DragDropList items={newForm.questions} setItems={setQuestions}>
+              {newForm.questions?.map((question) => (
+                <DragDropItem
+                  key={question.id}
+                  id={question.id}
+                  active={question.active}
+                >
+                  <EditQuestion
+                    question={question}
+                    setActive={() => setActive(question.id)}
+                    changeText={(text) => setQuestionText(question.id, text)}
+                    changeType={(type) => setQuestionType(question.id, type)}
+                    removeQuestion={() => removeQuestion(question.id)}
+                    changeOptionText={(text, index) =>
+                      setOptionText(question.id, index, text)
+                    }
+                    addOption={() => addOption(question.id)}
+                    removeOption={(index) => removeOption(question.id, index)}
+                  />
                 </DragDropItem>
               ))}
             </DragDropList>
             <button //add question
+              type="button"
               className="flex items-center gap-x-2 bg-green-600 rounded-md px-2 py-1 text-white font-semibold hover:bg-green-500"
-              onClick={(e) => {
-                e.preventDefault();
-                const newQuestions = [...questions];
-                newQuestions.forEach((q) => (q.active = false));
-                newQuestions.push({
-                  id: uuidv4(),
-                  type: 1,
-                  text: "",
-                  options: ["YES", "NO", "N/A"],
-                  active: true,
-                });
-                setQuestions(newQuestions);
-              }}
+              onClick={addQuestion}
             >
               Add Question
               <span>
                 <PlusCircleIcon className="w-8" />
               </span>
             </button>
-            <DragDropList items={footerNotes} setItems={setFooterNotes}>
-              {footerNotes.map((note) => (
+            <DragDropList items={newForm.footerNotes} setItems={setFooterNotes}>
+              {newForm.footerNotes?.map((note) => (
                 <DragDropItem key={note.id} id={note.id}>
                   <input //footer note input
                     type="text"
@@ -231,15 +294,19 @@ export default function CreateForm() {
                     placeholder="Note..."
                     value={note.text}
                     onChange={(e) => {
-                      const notes = [...footerNotes];
+                      const notes = JSON.parse(
+                        JSON.stringify(newForm.footerNotes)
+                      );
                       notes.find((n) => n.id === note.id).text = e.target.value;
                       setFooterNotes(notes);
                     }}
                   />
                   <button //remove footer note
-                    onClick={(e) => {
-                      e.preventDefault();
-                      let notes = [...footerNotes];
+                    type="button"
+                    onClick={() => {
+                      let notes = JSON.parse(
+                        JSON.stringify(newForm.footerNotes)
+                      );
                       notes = notes.filter((n) => n.id !== note.id);
                       setFooterNotes(notes);
                     }}
@@ -250,10 +317,10 @@ export default function CreateForm() {
               ))}
             </DragDropList>
             <button //add footer note
+              type="button"
               className="flex items-center gap-x-2 bg-green-600 rounded-md px-2 py-1 text-white font-semibold hover:bg-green-500"
-              onClick={(e) => {
-                e.preventDefault();
-                const notes = [...footerNotes];
+              onClick={() => {
+                const notes = JSON.parse(JSON.stringify(newForm.footerNotes));
                 notes.push({ id: uuidv4(), text: "" });
                 setFooterNotes(notes);
               }}

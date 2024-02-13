@@ -31,7 +31,7 @@ export const getForm = (formId) => async (dispatch) => {
   return form;
 };
 
-export const updateNewForm = (form) => async (dispatch) => {
+export const updateNewForm = (form) => (dispatch) => {
   dispatch(setNewForm(form));
   return form;
 };
