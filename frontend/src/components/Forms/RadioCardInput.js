@@ -11,7 +11,7 @@ export default function RadioCardInput({ question, changeAnswers }) {
   useEffect(() => {
     if (selection === "") return;
     changeAnswers(question.id, selection);
-  }, [selection]);
+  }, [selection, question.id]);
 
   return (
     <div>
@@ -22,7 +22,7 @@ export default function RadioCardInput({ question, changeAnswers }) {
       </div>
       <RadioGroup value={selection} onChange={setSelection} className="mt-2">
         <RadioGroup.Label className="sr-only">{question.text}</RadioGroup.Label>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+        <div className="flex gap-4 flex-col">
           {question.options.map((option, index) => (
             <RadioGroup.Option
               key={index}
