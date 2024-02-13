@@ -1,30 +1,11 @@
-import { useContext } from "react";
-import { FormContext } from "../../../../context/formContext";
 import { PlusIcon, MinusIcon } from "@heroicons/react/24/solid";
 
-export default function QuestionDisplay({ question }) {
-  const { questions, setQuestions } = useContext(FormContext);
-
-  function changeOption(value, index) {
-    const newQuestions = [...questions];
-    newQuestions.find((q) => q.id === question.id).options[index] = value;
-    setQuestions(newQuestions);
-  }
-
-  function addOption() {
-    const newQuestions = [...questions];
-    newQuestions.find((q) => q.id === question.id).options.push("");
-    setQuestions(newQuestions);
-  }
-
-  function removeOption(index) {
-    return () => {
-      const newQuestions = [...questions];
-      newQuestions.find((q) => q.id === question.id).options.splice(index, 1);
-      setQuestions(newQuestions);
-    };
-  }
-
+export default function QuestionDisplay({
+  question,
+  changeOption,
+  addOption,
+  removeOption,
+}) {
   let type = "";
   let value;
   switch (question.type) {

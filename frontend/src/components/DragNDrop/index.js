@@ -8,7 +8,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 
-export function DragDropItem({ id, children }) {
+export function DragDropItem({ id, children, active }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: id,
@@ -22,6 +22,8 @@ export function DragDropItem({ id, children }) {
       scaleX: 1,
       scaleY: 1,
     }),
+    position: "relative",
+    zIndex: active ? 40 : 0,
   };
 
   return (
